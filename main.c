@@ -135,11 +135,12 @@ int moveSnoop(char matrix[10][20], struct Element **allBlocks, int input) {
                 case BIRD:
                     allBlocks[i]->type = EMPTY;
                     break;
+
             }
         }
     }
     matrix[oldX][oldY] = ' ';
-    return 1;
+    return 0;
 }
 
 
@@ -210,12 +211,14 @@ void GAMEOVER(){
     printf("***  VOUS ALLEZ ETRE REDIRIGER VERS LE MENU  ***");
 
 }
+
 int conditionGagne(int oiseau1, int oiseau2, int oiseau3,int oiseau4,int gameover){
     gameover = 0;
-    if (oiseau1 == ' ' && oiseau2 == ' ' && oiseau3 == ' ' && oiseau4 == ' '){
+    if (oiseau1 == EMPTY && oiseau2 == EMPTY && oiseau3 == EMPTY && oiseau4 == EMPTY){
         gameover = 1;
         printf("Vous avez gagne !!\n");
     }
+    return gameover;
 }
 
 void logicSnoopy() {
@@ -258,7 +261,7 @@ int main() {
         }
         case 2: {
             struct Element **elements = initBlocks();
-            printf("It passes here\n\n\n\n");
+
             // Blocs Poussables :
             int gameover = 0;
 
@@ -266,16 +269,17 @@ int main() {
 
                 updateMatrix(matrice, elements, NUM_BLOCKS);
                 printMatrix(matrice);
-                conditionGagne(elements[5]->uni,elements[6]->uni,elements[7]->uni,elements[8]->uni,gameover);
+                gameover = conditionGagne(elements[5]->type,elements[6]->type,elements[7]->type,elements[8]->type,gameover);
+                if (gameover == 1){
+                    break;
+                }
                 int input = getch();
+                system("cls");
 
-                if (input == 113){
+                if (input == 113){//q
                     exit(1);
                 }
                 moveSnoop(matrice, elements, input);
-
-
-
             }
             while (getchar() != '\n') {}
             break;
