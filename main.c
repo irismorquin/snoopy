@@ -6,7 +6,7 @@
 #include "mesFonctions.h"
 #define LONGUEUR 20
 #define LARGEUR 10
-
+int gameover;
 char matrice[10][20] = {'6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6', '6','6', '6',
                         '6', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', ' ', '6',
                         '6', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',' ', '6',
@@ -259,10 +259,14 @@ void *SnoopyTimerThread(void *args) {
     while (*seconds > 0) {
         system("cls");
         gotoxy(0, 0);
+        if (gameover == 1) {
+            return 0;
+        }
         printMatrix(matrice);
         printf("Timer: %d seconds\n", *seconds / 10);
         Sleep(100);
         (*seconds) -= 1;
+
     }
     printf("Timer reached 0. You're very bad at this game.\n");
     pthread_exit(NULL);
@@ -289,15 +293,12 @@ int main() {
             struct Element **elements = initBlocks();
 
             // Blocs Poussables :
-            int gameover = 0;
+            gameover = 0;
 
             while (gameover!=1) {
 
                 updateMatrix(matrice, elements, NUM_BLOCKS);
                 gameover = conditionGagne(elements[5]->type,elements[6]->type,elements[7]->type,elements[8]->type,gameover);
-                if (gameover == 1){
-                    break;
-                }
                 int input = getch();
 
 
@@ -310,7 +311,10 @@ int main() {
                 fprintf(stderr, "Error joining timer thread.\n");
                 exit(EXIT_FAILURE);
             }
-            while (getchar() != '\n') {}
+//            while (getchar() != '\n') {}
+
+            printf("\nBravo!\n");
+            sleep(2);
             break;
         }
         case 3:
