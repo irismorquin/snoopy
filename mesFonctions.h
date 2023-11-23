@@ -1,6 +1,7 @@
 #ifndef UNTITLED_MESFONCTIONS_H
 
 #include "stdio.h"
+#include <pthread.h>
 #define NUM_BLOCKS 18
 enum BlockType {
     EMPTY = 0,

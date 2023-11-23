@@ -36,6 +36,12 @@ void timerSnoopy(int s) {                                            //SOUS PROG
         usleep(1);     //usleep(100000) 1s     // attendre 100 000 micro secondes (0.1 secondes)
     }
 }
+void gotoxy(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
 void vieSnoopy(int vies) {   // SOUS PROGRAMME VIES DE SNOOPY
 
     Color(5,0);
@@ -247,7 +253,20 @@ void logicSnoopy() {
     sleep(3);
     system("cls");
 }
+void *SnoopyTimerThread(void *args) {
+    int *seconds = (int *)args;
 
+    while (*seconds > 0) {
+        system("cls");
+        gotoxy(0, 0);
+        printMatrix(matrice);
+        printf("Timer: %d seconds\n", *seconds / 10);
+        Sleep(100);
+        (*seconds) -= 1;
+    }
+    printf("Timer reached 0. You're very bad at this game.\n");
+    pthread_exit(NULL);
+}
 
 int main() {
    int numero = init();
@@ -260,6 +279,13 @@ int main() {
             break;
         }
         case 2: {
+            pthread_t timerTid;
+            int timerValue = 200;
+
+            if (pthread_create(&timerTid, NULL, SnoopyTimerThread, &timerValue) != 0) {
+                fprintf(stderr, "Error creating timer thread.\n");
+                exit(EXIT_FAILURE);
+            }
             struct Element **elements = initBlocks();
 
             // Blocs Poussables :
@@ -268,18 +294,21 @@ int main() {
             while (gameover!=1) {
 
                 updateMatrix(matrice, elements, NUM_BLOCKS);
-                printMatrix(matrice);
                 gameover = conditionGagne(elements[5]->type,elements[6]->type,elements[7]->type,elements[8]->type,gameover);
                 if (gameover == 1){
                     break;
                 }
                 int input = getch();
-                system("cls");
+
 
                 if (input == 113){//q
                     exit(1);
                 }
                 moveSnoop(matrice, elements, input);
+            }
+            if (pthread_join(timerTid, NULL) != 0) {
+                fprintf(stderr, "Error joining timer thread.\n");
+                exit(EXIT_FAILURE);
             }
             while (getchar() != '\n') {}
             break;
